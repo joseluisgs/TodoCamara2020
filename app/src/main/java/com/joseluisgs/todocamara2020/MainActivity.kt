@@ -1,6 +1,7 @@
 package com.joseluisgs.todocamara2020
 
 import android.Manifest
+import android.app.AlertDialog
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -10,6 +11,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,8 +38,59 @@ class MainActivity : AppCompatActivity() {
      * Inicia la interfaz y los eventos de la apliación
      */
     private fun initUI() {
+        // Iniciamos el Modo
+        initModo()
+        // Eventos botones
+        initBotones()
         // Iniciamos los permisos
         initPermisos()
+    }
+
+    /**
+     * Inicia los eventos de los botones
+     */
+    private fun initBotones() {
+        mainBtnAccion.setOnClickListener {
+            initDialogFoto()
+        }
+    }
+
+    /**
+     * Iniciamos el modo de funcionamiento
+     */
+    private fun initModo() {
+        if (PRIVADO)
+            mainTvModo.text = "MODO PRIVADO"
+        else
+            mainTvModo.text = "MODO PÚBLICO"
+    }
+
+    /**
+     * Muestra el diálogo para tomar foto o elegir de la galería
+     */
+    private fun initDialogFoto() {
+        val fotoDialogoItems = arrayOf(
+            "Seleccionar fotografía de galería",
+            "Capturar fotografía desde la cámara"
+        )
+        // Creamos el dialog con su builder
+        AlertDialog.Builder(this)
+            .setTitle("Seleccionar Acción")
+            .setItems(fotoDialogoItems) { dialog, modo ->
+                when (modo) {
+                    0 -> elegirFotoGaleria()
+                    1 -> tomarFotoCamara()
+                }
+            }
+            .show()
+    }
+
+    private fun elegirFotoGaleria() {
+        TODO("Not yet implemented")
+    }
+
+    private fun tomarFotoCamara() {
+        TODO("Not yet implemented")
     }
 
     /**
