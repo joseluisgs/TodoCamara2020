@@ -128,7 +128,11 @@ class MainActivity : AppCompatActivity() {
                     // Obtenemos el bitmap de su almacenamiento externo
                     val source: ImageDecoder.Source = ImageDecoder.createSource(this.contentResolver, contentURI)
                     val bitmap: Bitmap = ImageDecoder.decodeBitmap(source)
-                    Toast.makeText(this, "¡Foto salvada!", Toast.LENGTH_SHORT).show()
+                    // Para jugar con las proporciones y ahorrar en memoria no cargando toda la foto, solo carga 600px max
+                    val prop = PROPORCION / bitmap.width.toFloat()
+                    // Actualizamos el bitmap para ese tamaño
+                    val foto = Bitmap.createScaledBitmap(bitmap, PROPORCION, (bitmap.height * prop).toInt(), false)
+                    Toast.makeText(this, "¡Foto rescatada de la galería!", Toast.LENGTH_SHORT).show()
                     mainIvImagen.setImageBitmap(bitmap)
                     mainTvPath.text = data.data.toString()
                 } catch (e: IOException) {
