@@ -1,6 +1,7 @@
 package com.joseluisgs.todocamara2020
 
 import android.Manifest
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,18 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 
 
 class MainActivity : AppCompatActivity() {
+    // Constantes
+    private val GALERIA = 1
+    private val CAMARA = 2
+
+    // Si vamos a operar en modo público o privado (es decir si salvamos en la galería o no)
+    private val PRIVADO = true
+
+    // Directorio para salvar las cosas
+    private val IMAGE_DIRECTORY = "/camara2020"
+    var photoURI: Uri? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
