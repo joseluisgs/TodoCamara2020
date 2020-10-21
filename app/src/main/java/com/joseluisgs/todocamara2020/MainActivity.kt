@@ -2,8 +2,13 @@ package com.joseluisgs.todocamara2020
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.karumi.dexter.Dexter
@@ -12,6 +17,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
@@ -19,12 +25,13 @@ class MainActivity : AppCompatActivity() {
     private val GALERIA = 1
     private val CAMARA = 2
 
-    // Si vamos a operar en modo público o privado (es decir si salvamos en la galería o no)
-    private val PRIVADO = true
+    // Si vamos a operar en modo público o privado (es decir si salvamos en nuestro directorio)
+    private val PRIVADO = false
 
     // Directorio para salvar las cosas
     private val IMAGE_DIRECTORY = "/camara2020"
     var photoURI: Uri? = null
+    private val PROPORCION = 600
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,13 +92,53 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    /**
+     * Elige una foto de la galeria
+     */
     private fun elegirFotoGaleria() {
-        TODO("Not yet implemented")
+        val galleryIntent = Intent(
+            Intent.ACTION_PICK,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        )
+        startActivityForResult(galleryIntent, GALERIA)
     }
 
     private fun tomarFotoCamara() {
         TODO("Not yet implemented")
     }
+
+    /**
+     * Siempre se ejecuta al realizar una acción
+     * @param requestCode Int
+     * @param resultCode Int
+     * @param data Intent?
+     */
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d("FOTO", "Opción::--->$requestCode")
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_CANCELED) {
+            Log.d("FOTO", "Se ha cancelado")
+        }
+        if (requestCode == GALERIA) {
+            Log.d("FOTO", "Entramos en Galería")
+            if (data != null) {
+                // Obtenemos su URI con su dirección temporal
+                val contentURI = data.data!!
+                try {
+                    // Obtenemos el bitmap de su almacenamiento externo
+                    val source: ImageDecoder.Source = ImageDecoder.createSource(this.contentResolver, contentURI)
+                    val bitmap: Bitmap = ImageDecoder.decodeBitmap(source)
+                    Toast.makeText(this, "¡Foto salvada!", Toast.LENGTH_SHORT).show()
+                    mainIvImagen.setImageBitmap(bitmap)
+                    mainTvPath.text = data.data.toString()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    Toast.makeText(this, "¡Fallo Galeria!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
 
     /**
      * Comprobamos los permisos de la aplicación
