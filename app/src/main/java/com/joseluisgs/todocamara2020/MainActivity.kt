@@ -7,6 +7,8 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -26,12 +28,13 @@ class MainActivity : AppCompatActivity() {
     private val CAMARA = 2
 
     // Si vamos a operar en modo público o privado (es decir si salvamos en nuestro directorio)
-    private val PRIVADO = false
+    private val PUBLICO = true
 
-    // Directorio para salvar las cosas
-    private val IMAGE_DIRECTORY = "/camara2020"
-    var photoURI: Uri? = null
+
+    private val IMAGEN_DIR = "/MiCamara"
+    var IMAGEN_URI: Uri? = null
     private val PROPORCION = 600
+    private var IMAGEN_NOMBRE = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,10 +69,10 @@ class MainActivity : AppCompatActivity() {
      * Iniciamos el modo de funcionamiento
      */
     private fun initModo() {
-        if (PRIVADO)
-            mainTvModo.text = "MODO PRIVADO"
-        else
+        if (PUBLICO)
             mainTvModo.text = "MODO PÚBLICO"
+        else
+            mainTvModo.text = "MODO PRIVADO"
     }
 
     /**
@@ -103,8 +106,22 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(galleryIntent, GALERIA)
     }
 
+    //Llamamos al intent de la camara
+    // https://developer.android.com/training/camera/photobasics.html#TaskPath
     private fun tomarFotoCamara() {
-        TODO("Not yet implemented")
+        // Si queremos hacer uso de fotos en aklta calidad
+        val builder = VmPolicy.Builder()
+        StrictMode.setVmPolicy(builder.build())
+
+        // Eso para alta o baja
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        // Nombre de la imagen
+        IMAGEN_NOMBRE = Utilidades.crearNombreFichero()
+        // Esto para alta calidad
+        IMAGEN_URI = Uri.fromFile(Utilidades.salvarImagen(IMAGEN_DIR, IMAGEN_NOMBRE, applicationContext));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, IMAGEN_URI)
+        // Esto para alta y baja
+        startActivityForResult(intent, CAMARA)
     }
 
     /**
@@ -139,6 +156,22 @@ class MainActivity : AppCompatActivity() {
                     e.printStackTrace()
                     Toast.makeText(this, "¡Fallo Galeria!", Toast.LENGTH_SHORT).show()
                 }
+            }
+        } else if (requestCode == CAMARA) {
+            Log.d("FOTO", "Entramos en Camara");
+            // Cogemos la imagen, pero podemos coger la imagen o su modo en baja calidad (thumbnail)
+            try {
+                // Esta línea para baja calidad
+                //thumbnail = (Bitmap) data.getExtras().get("data");
+                // Esto para alta
+                val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, IMAGEN_URI!!)
+                val foto: Bitmap = ImageDecoder.decodeBitmap(source)
+                mainIvImagen.setImageBitmap(foto);
+                mainTvPath.text = IMAGEN_URI.toString()
+                Toast.makeText(this, "¡Foto Salvada!", Toast.LENGTH_SHORT).show();
+            } catch (e: Exception) {
+                e.printStackTrace();
+                Toast.makeText(this, "¡Fallo Camara!", Toast.LENGTH_SHORT).show();
             }
         }
     }
