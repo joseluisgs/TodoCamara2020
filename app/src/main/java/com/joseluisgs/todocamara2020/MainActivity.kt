@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         mainBtnEliminar.setOnClickListener {
-            eliminarImagen();
+            eliminarImagen()
         }
     }
 
@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         } else if (requestCode == CAMARA) {
-            Log.d("FOTO", "Entramos en Camara");
+            Log.d("FOTO", "Entramos en Camara")
             // Cogemos la imagen, pero podemos coger la imagen o su modo en baja calidad (thumbnail)
             try {
                 // Esta línea para baja calidad
@@ -201,13 +201,13 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // Mostramos
-                mainIvImagen.setImageBitmap(foto);
+                mainIvImagen.setImageBitmap(foto)
                 mainTvPath.text = IMAGEN_URI.toString()
 
-                Toast.makeText(this, "¡Foto Salvada!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "¡Foto Salvada!", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-                e.printStackTrace();
-                Toast.makeText(this, "¡Fallo Camara!", Toast.LENGTH_SHORT).show();
+                e.printStackTrace()
+                Toast.makeText(this, "¡Fallo Camara!", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -219,9 +219,11 @@ class MainActivity : AppCompatActivity() {
             Utilidades.eliminarImageGaleria(IMAGEN_NOMBRE, applicationContext)
         }
         // La borramos del directorio
-        Utilidades.eliminarImagen(IMAGEN_URI)
-
-        Toast.makeText(this, "¡Foto Eliminada!", Toast.LENGTH_SHORT).show();
+        try {
+            Utilidades.eliminarImagen(IMAGEN_URI)
+            Toast.makeText(this, "¡Foto Eliminada!", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+        }
     }
 
 
