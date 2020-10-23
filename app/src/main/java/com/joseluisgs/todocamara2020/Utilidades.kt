@@ -2,10 +2,13 @@ package com.joseluisgs.todocamara2020
 
 import android.content.ContentValues
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 
@@ -21,7 +24,7 @@ object Utilidades {
     /**
      * Salva un fichero en un directorio
      */
-    fun salvarImagen(path: String, nombre: String, compresion: Int, context: Context): File? {
+    fun salvarImagen(path: String, nombre: String, context: Context): File? {
         // Almacenamos en nuestro directorio de almacenamiento externo asignado en Pictures
         val dirFotos = File((context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath) + path)
         // Si no existe el directorio, lo creamos solo si es publico
@@ -31,13 +34,22 @@ object Utilidades {
         try {
             val f = File(dirFotos, nombre)
             f.createNewFile()
-
             return f
         } catch (e1: Exception) {
             e1.printStackTrace()
         }
         return null
     }
+
+    fun comprimirImagen(fichero: File, bitmap: Bitmap, compresion: Int) {
+        // Recuperamos el Bitmap
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, compresion, bytes)
+        val fo = FileOutputStream(fichero)
+        fo.write(bytes.toByteArray())
+        fo.close()
+    }
+
 
     fun añadirImagenGaleria(foto: File, nombre: String, context: Context) {
         val values = ContentValues()

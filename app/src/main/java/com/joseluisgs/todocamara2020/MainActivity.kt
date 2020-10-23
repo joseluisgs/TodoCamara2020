@@ -13,6 +13,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toFile
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var IMAGEN_URI: Uri
     private val PROPORCION = 600
     private var IMAGEN_NOMBRE = ""
-    private var IMAGEN_COMPRES = 90
+    private var IMAGEN_COMPRES = 30
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,7 +120,7 @@ class MainActivity : AppCompatActivity() {
         // Nombre de la imagen
         IMAGEN_NOMBRE = Utilidades.crearNombreFichero()
         // Salvamos el fichero
-        val fichero = Utilidades.salvarImagen(IMAGEN_DIR, IMAGEN_NOMBRE, IMAGEN_COMPRES, applicationContext)!!
+        val fichero = Utilidades.salvarImagen(IMAGEN_DIR, IMAGEN_NOMBRE, applicationContext)!!
         IMAGEN_URI = Uri.fromFile(fichero)
         // Si estamos en módo publico la añadimos en la biblioteca
         if (PUBLICO) {
@@ -158,6 +159,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "¡Foto rescatada de la galería!", Toast.LENGTH_SHORT).show()
                     mainIvImagen.setImageBitmap(bitmap)
                     mainTvPath.text = data.data.toString()
+
                 } catch (e: IOException) {
                     e.printStackTrace()
                     Toast.makeText(this, "¡Fallo Galeria!", Toast.LENGTH_SHORT).show()
@@ -170,10 +172,14 @@ class MainActivity : AppCompatActivity() {
                 // Esta línea para baja calidad
                 //thumbnail = (Bitmap) data.getExtras().get("data");
                 // Esto para alta
-                val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, IMAGEN_URI!!)
+                val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, IMAGEN_URI)
                 val foto: Bitmap = ImageDecoder.decodeBitmap(source)
                 mainIvImagen.setImageBitmap(foto);
                 mainTvPath.text = IMAGEN_URI.toString()
+
+                // Vamos a probar a comprimir
+                Utilidades.comprimirImagen(IMAGEN_URI.toFile(), foto, IMAGEN_COMPRES)
+
                 Toast.makeText(this, "¡Foto Salvada!", Toast.LENGTH_SHORT).show();
             } catch (e: Exception) {
                 e.printStackTrace();
