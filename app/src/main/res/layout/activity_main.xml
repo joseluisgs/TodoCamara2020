@@ -7,9 +7,14 @@
             android:id="@+id/mainTvModo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView" android:textColor="@color/colorPrimaryDark" android:textStyle="bold"
+            android:text="Privado" android:textColor="@color/colorPrimaryDark" android:textStyle="bold"
             android:gravity="center|center_horizontal|center_vertical"/>
 
+    <Switch
+            android:text="Modo de Ejecución"
+            android:layout_width="304dp"
+            android:layout_height="wrap_content" android:id="@+id/mainSwOpcion" android:showText="false"
+            android:checked="true" android:textColor="@color/colorPrimaryDark" android:textAlignment="viewEnd"/>
     <Button
             android:id="@+id/mainBtnAccion"
             android:layout_width="wrap_content"
@@ -34,5 +39,17 @@
             android:layout_height="61dp"
             android:text="Path" android:gravity="center|center_horizontal|center_vertical"
             android:textColor="@color/colorPrimary"/>
+    <TextView
+            android:text="Compresion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/textView" android:gravity="center_horizontal"
+            android:textColor="@color/colorPrimaryDark"/>
+    <SeekBar
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="10"
+            android:progress="8"
+            android:id="@+id/mainSeekCompresion"/>
 
 </LinearLayout>

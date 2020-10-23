@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private val CAMARA = 2
 
     // Si vamos a operar en modo público o privado (es decir si salvamos en nuestro directorio)
-    private val PUBLICO = true
+    private var PUBLICO = true
 
 
     private val IMAGEN_DIR = "/TodoCamara2020"
@@ -50,12 +50,19 @@ class MainActivity : AppCompatActivity() {
      * Inicia la interfaz y los eventos de la apliación
      */
     private fun initUI() {
-        // Iniciamos el Modo
-        initModo()
+        // Inicamos la opcion
+        initOpcion()
+        initModo(PUBLICO)
         // Eventos botones
         initBotones()
+
         // Iniciamos los permisos
         initPermisos()
+    }
+
+
+    fun initOpcion() {
+        mainSwOpcion.setOnCheckedChangeListener { compoundButton, b -> initModo(b) }
     }
 
     /**
@@ -70,7 +77,8 @@ class MainActivity : AppCompatActivity() {
     /**
      * Iniciamos el modo de funcionamiento
      */
-    private fun initModo() {
+    private fun initModo(modo: Boolean) {
+        PUBLICO = modo
         if (PUBLICO)
             mainTvModo.text = "MODO PÚBLICO"
         else
@@ -122,10 +130,7 @@ class MainActivity : AppCompatActivity() {
         // Salvamos el fichero
         val fichero = Utilidades.salvarImagen(IMAGEN_DIR, IMAGEN_NOMBRE, applicationContext)!!
         IMAGEN_URI = Uri.fromFile(fichero)
-        // Si estamos en módo publico la añadimos en la biblioteca
-        if (PUBLICO) {
-            Utilidades.añadirImagenGaleria(fichero, IMAGEN_NOMBRE, applicationContext)
-        }
+
         intent.putExtra(MediaStore.EXTRA_OUTPUT, IMAGEN_URI)
         // Esto para alta y baja
         startActivityForResult(intent, CAMARA)
@@ -174,11 +179,19 @@ class MainActivity : AppCompatActivity() {
                 // Esto para alta
                 val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, IMAGEN_URI)
                 val foto: Bitmap = ImageDecoder.decodeBitmap(source)
-                mainIvImagen.setImageBitmap(foto);
-                mainTvPath.text = IMAGEN_URI.toString()
 
                 // Vamos a probar a comprimir
+                IMAGEN_COMPRES = mainSeekCompresion.progress * 10
                 Utilidades.comprimirImagen(IMAGEN_URI.toFile(), foto, IMAGEN_COMPRES)
+
+                // Si estamos en módo publico la añadimos en la biblioteca
+                if (PUBLICO) {
+                    Utilidades.añadirImagenGaleria(IMAGEN_URI, IMAGEN_NOMBRE, applicationContext)
+                }
+
+                // Mostramos
+                mainIvImagen.setImageBitmap(foto);
+                mainTvPath.text = IMAGEN_URI.toString()
 
                 Toast.makeText(this, "¡Foto Salvada!", Toast.LENGTH_SHORT).show();
             } catch (e: Exception) {
