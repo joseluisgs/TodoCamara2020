@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import java.io.File
 import java.util.*
 
@@ -20,7 +21,7 @@ object Utilidades {
     /**
      * Salva un fichero en un directorio
      */
-    fun salvarImagen(path: String, nombre: String, context: Context): File? {
+    fun salvarImagen(path: String, nombre: String, compresion: Int, context: Context): File? {
         // Almacenamos en nuestro directorio de almacenamiento externo asignado en Pictures
         val dirFotos = File((context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath) + path)
         // Si no existe el directorio, lo creamos solo si es publico
@@ -30,6 +31,7 @@ object Utilidades {
         try {
             val f = File(dirFotos, nombre)
             f.createNewFile()
+
             return f
         } catch (e1: Exception) {
             e1.printStackTrace()
@@ -37,7 +39,7 @@ object Utilidades {
         return null
     }
 
-    private fun añadirImagenGaleria(foto: File, nombre: String, context: Context) {
+    fun añadirImagenGaleria(foto: File, nombre: String, context: Context) {
         val values = ContentValues()
         values.put(MediaStore.Images.Media.TITLE, "imagen")
         values.put(MediaStore.Images.Media.DISPLAY_NAME, nombre)
@@ -50,5 +52,15 @@ object Utilidades {
 
     }
 
-
+    fun borrarFichero(path: String) {
+        // Borramos la foto de alta calidad
+        val fdelete = File(path)
+        if (fdelete.exists()) {
+            if (fdelete.delete()) {
+                Log.d("FOTO", "Foto borrada::--->$path")
+            } else {
+                Log.d("FOTO", "Foto NO borrada::--->$path")
+            }
+        }
+    }
 }

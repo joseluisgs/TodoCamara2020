@@ -31,10 +31,11 @@ class MainActivity : AppCompatActivity() {
     private val PUBLICO = true
 
 
-    private val IMAGEN_DIR = "/MiCamara"
-    var IMAGEN_URI: Uri? = null
+    private val IMAGEN_DIR = "/TodoCamara2020"
+    private lateinit var IMAGEN_URI: Uri
     private val PROPORCION = 600
     private var IMAGEN_NOMBRE = ""
+    private var IMAGEN_COMPRES = 90
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,8 +118,13 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         // Nombre de la imagen
         IMAGEN_NOMBRE = Utilidades.crearNombreFichero()
-        // Esto para alta calidad
-        IMAGEN_URI = Uri.fromFile(Utilidades.salvarImagen(IMAGEN_DIR, IMAGEN_NOMBRE, applicationContext));
+        // Salvamos el fichero
+        val fichero = Utilidades.salvarImagen(IMAGEN_DIR, IMAGEN_NOMBRE, IMAGEN_COMPRES, applicationContext)!!
+        IMAGEN_URI = Uri.fromFile(fichero)
+        // Si estamos en módo publico la añadimos en la biblioteca
+        if (PUBLICO) {
+            Utilidades.añadirImagenGaleria(fichero, IMAGEN_NOMBRE, applicationContext)
+        }
         intent.putExtra(MediaStore.EXTRA_OUTPUT, IMAGEN_URI)
         // Esto para alta y baja
         startActivityForResult(intent, CAMARA)
@@ -143,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                 val contentURI = data.data!!
                 try {
                     // Obtenemos el bitmap de su almacenamiento externo
-                    val source: ImageDecoder.Source = ImageDecoder.createSource(this.contentResolver, contentURI)
+                    val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, contentURI)
                     val bitmap: Bitmap = ImageDecoder.decodeBitmap(source)
                     // Para jugar con las proporciones y ahorrar en memoria no cargando toda la foto, solo carga 600px max
                     val prop = PROPORCION / bitmap.width.toFloat()
