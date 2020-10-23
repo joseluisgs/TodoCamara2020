@@ -31,9 +31,10 @@ class MainActivity : AppCompatActivity() {
     // Si vamos a operar en modo público o privado (es decir si salvamos en nuestro directorio)
     private var PUBLICO = true
 
-
+    // https://developer.android.com/training/data-storage/shared/media?hl=es-419
     private val IMAGEN_DIR = "/TodoCamara2020"
     private lateinit var IMAGEN_URI: Uri
+    private lateinit var IMAGEN_MEDIA_URI: Uri
     private val PROPORCION = 600
     private var IMAGEN_NOMBRE = ""
     private var IMAGEN_COMPRES = 30
@@ -50,6 +51,7 @@ class MainActivity : AppCompatActivity() {
      * Inicia la interfaz y los eventos de la apliación
      */
     private fun initUI() {
+
         // Inicamos la opcion
         initOpcion()
         initModo(PUBLICO)
@@ -71,6 +73,10 @@ class MainActivity : AppCompatActivity() {
     private fun initBotones() {
         mainBtnAccion.setOnClickListener {
             initDialogFoto()
+        }
+
+        mainBtnEliminar.setOnClickListener {
+            eliminarImagen();
         }
     }
 
@@ -159,11 +165,15 @@ class MainActivity : AppCompatActivity() {
                     val bitmap: Bitmap = ImageDecoder.decodeBitmap(source)
                     // Para jugar con las proporciones y ahorrar en memoria no cargando toda la foto, solo carga 600px max
                     val prop = PROPORCION / bitmap.width.toFloat()
-                    // Actualizamos el bitmap para ese tamaño
+                    // Actualizamos el bitmap para ese tamaño, luego podríamos reducir su calidad
                     val foto = Bitmap.createScaledBitmap(bitmap, PROPORCION, (bitmap.height * prop).toInt(), false)
                     Toast.makeText(this, "¡Foto rescatada de la galería!", Toast.LENGTH_SHORT).show()
                     mainIvImagen.setImageBitmap(bitmap)
                     mainTvPath.text = data.data.toString()
+
+                    // Vamos a compiar nuestra imagen en nuestro directorio
+                    Utilidades.copiarImagen(bitmap, IMAGEN_DIR, IMAGEN_COMPRES, applicationContext)
+
 
                 } catch (e: IOException) {
                     e.printStackTrace()
@@ -186,7 +196,8 @@ class MainActivity : AppCompatActivity() {
 
                 // Si estamos en módo publico la añadimos en la biblioteca
                 if (PUBLICO) {
-                    Utilidades.añadirImagenGaleria(IMAGEN_URI, IMAGEN_NOMBRE, applicationContext)
+                    // Por su queemos guardar el URI con la que se almacena en la Mediastore
+                    IMAGEN_MEDIA_URI = Utilidades.añadirImagenGaleria(IMAGEN_URI, IMAGEN_NOMBRE, applicationContext)!!
                 }
 
                 // Mostramos
@@ -199,6 +210,18 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "¡Fallo Camara!", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private fun eliminarImagen() {
+        // La borramos de media
+        // https://developer.android.com/training/data-storage/shared/media
+        if (PUBLICO) {
+            Utilidades.eliminarImageGaleria(IMAGEN_NOMBRE, applicationContext)
+        }
+        // La borramos del directorio
+        Utilidades.eliminarImagen(IMAGEN_URI)
+
+        Toast.makeText(this, "¡Foto Eliminada!", Toast.LENGTH_SHORT).show();
     }
 
 

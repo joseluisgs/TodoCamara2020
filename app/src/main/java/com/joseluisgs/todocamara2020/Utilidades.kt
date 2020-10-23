@@ -1,12 +1,13 @@
 package com.joseluisgs.todocamara2020
 
+
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import androidx.core.net.toFile
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -43,6 +44,9 @@ object Utilidades {
         return null
     }
 
+    /**
+     * Comprime una imagen
+     */
     fun comprimirImagen(fichero: File, bitmap: Bitmap, compresion: Int) {
         // Recuperamos el Bitmap
         val bytes = ByteArrayOutputStream()
@@ -52,8 +56,10 @@ object Utilidades {
         fo.close()
     }
 
-
-    fun añadirImagenGaleria(foto: Uri, nombre: String, context: Context) {
+    /**
+     * Añade una imagen a la galería
+     */
+    fun añadirImagenGaleria(foto: Uri, nombre: String, context: Context): Uri? {
         val values = ContentValues()
         values.put(MediaStore.Images.Media.TITLE, "imagen")
         values.put(MediaStore.Images.Media.DISPLAY_NAME, nombre)
@@ -62,19 +68,71 @@ object Utilidades {
         values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
         values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
         values.put(MediaStore.Images.Media.DATA, foto.toFile().absolutePath)
-        context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        return context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
     }
 
-    fun borrarFichero(path: String) {
-        // Borramos la foto de alta calidad
-        val fdelete = File(path)
-        if (fdelete.exists()) {
-            if (fdelete.delete()) {
-                Log.d("FOTO", "Foto borrada::--->$path")
-            } else {
-                Log.d("FOTO", "Foto NO borrada::--->$path")
+    /**
+     * Elimina una imagen de la galería
+     */
+    fun eliminarImageGaleria(nombre: String, context: Context) {
+        // Realizamos la consulta
+        val projection = arrayOf(
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.DISPLAY_NAME,
+        )
+        val selection = "${MediaStore.Images.Media.DISPLAY_NAME} == ?"
+
+        val selectionArgs = arrayOf(nombre)
+        val sortOrder = "${MediaStore.Images.Media.DISPLAY_NAME} ASC"
+
+        context.contentResolver.query(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            selectionArgs,
+            sortOrder
+        )?.use { cursor ->
+            // Cache column indices.
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val nameColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+
+            while (cursor.moveToNext()) {
+                // Get values of columns for a given video.
+                val id = cursor.getLong(idColumn)
+                val name = cursor.getString(nameColumn)
+
+                val contentUri: Uri = ContentUris.withAppendedId(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    id
+                )
+
+                // Borramos
+                context.contentResolver.delete(contentUri, null, null);
             }
         }
+    }
+
+    /**
+     * Elimina una imagen
+     */
+    fun eliminarImagen(imagenUri: Uri) {
+        if (imagenUri.toFile().exists())
+            imagenUri.toFile().delete()
+    }
+
+    /**
+     * Copia un bitmap en un path determinado
+     */
+    fun copiarImagen(bitmap: Bitmap, path: String, compresion: Int, context: Context) {
+        val nombre = crearNombreFichero()
+        val fichero =
+            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath + path + File.separator + nombre
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, compresion, bytes)
+        val fo = FileOutputStream(fichero)
+        fo.write(bytes.toByteArray())
+        fo.close()
     }
 }

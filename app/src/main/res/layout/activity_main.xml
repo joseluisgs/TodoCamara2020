@@ -51,5 +51,10 @@
             android:max="10"
             android:progress="8"
             android:id="@+id/mainSeekCompresion"/>
+    <Button
+            android:text="Eliminar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/mainBtnEliminar"
+    />
 
 </LinearLayout>
