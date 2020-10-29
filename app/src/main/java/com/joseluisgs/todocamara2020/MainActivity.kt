@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
@@ -161,8 +162,14 @@ class MainActivity : AppCompatActivity() {
                 val contentURI = data.data!!
                 try {
                     // Obtenemos el bitmap de su almacenamiento externo
-                    val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, contentURI)
-                    val bitmap: Bitmap = ImageDecoder.decodeBitmap(source)
+                    // Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+                    val bitmap: Bitmap
+                    if (Build.VERSION.SDK_INT < 28) {
+                        bitmap = MediaStore.Images.Media.getBitmap(contentResolver, contentURI);
+                    } else {
+                        val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, contentURI)
+                        bitmap = ImageDecoder.decodeBitmap(source)
+                    }
                     // Para jugar con las proporciones y ahorrar en memoria no cargando toda la foto, solo carga 600px max
                     val prop = PROPORCION / bitmap.width.toFloat()
                     // Actualizamos el bitmap para ese tamaño, luego podríamos reducir su calidad
@@ -170,11 +177,8 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "¡Foto rescatada de la galería!", Toast.LENGTH_SHORT).show()
                     mainIvImagen.setImageBitmap(bitmap)
                     mainTvPath.text = data.data.toString()
-
                     // Vamos a compiar nuestra imagen en nuestro directorio
                     Utilidades.copiarImagen(bitmap, IMAGEN_DIR, IMAGEN_COMPRES, applicationContext)
-
-
                 } catch (e: IOException) {
                     e.printStackTrace()
                     Toast.makeText(this, "¡Fallo Galeria!", Toast.LENGTH_SHORT).show()
@@ -187,8 +191,17 @@ class MainActivity : AppCompatActivity() {
                 // Esta línea para baja calidad
                 //thumbnail = (Bitmap) data.getExtras().get("data");
                 // Esto para alta
-                val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, IMAGEN_URI)
-                val foto: Bitmap = ImageDecoder.decodeBitmap(source)
+                //val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, IMAGEN_URI)
+                //val foto: Bitmap = ImageDecoder.decodeBitmap(source)
+
+                val foto: Bitmap
+
+                if (Build.VERSION.SDK_INT < 28) {
+                    foto = MediaStore.Images.Media.getBitmap(contentResolver, IMAGEN_URI)
+                } else {
+                    val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, IMAGEN_URI)
+                    foto = ImageDecoder.decodeBitmap(source)
+                }
 
                 // Vamos a probar a comprimir
                 IMAGEN_COMPRES = mainSeekCompresion.progress * 10

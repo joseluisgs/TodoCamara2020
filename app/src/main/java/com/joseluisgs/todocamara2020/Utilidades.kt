@@ -28,8 +28,11 @@ object Utilidades {
      * Salva un fichero en un directorio
      */
     fun salvarImagen(path: String, nombre: String, context: Context): File? {
+        // Directorio publico
         // Almacenamos en nuestro directorio de almacenamiento externo asignado en Pictures
         val dirFotos = File((context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath) + path)
+        // Solo si queremos crear un directorio y que todo sea público
+        //val dirFotos = File(Environment.getExternalStorageDirectory().toString() + path)
         // Si no existe el directorio, lo creamos solo si es publico
         if (!dirFotos.exists()) {
             dirFotos.mkdirs()
