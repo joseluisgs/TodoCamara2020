@@ -1,18 +1,60 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical" android:id="@+id/mainLayout">
+
     <TextView
+            android:id="@+id/mainTvModo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Privado" android:textColor="@color/colorPrimaryDark" android:textStyle="bold"
+            android:gravity="center|center_horizontal|center_vertical"/>
+
+    <Switch
+            android:text="Modo de Ejecución"
+            android:layout_width="304dp"
+            android:layout_height="wrap_content" android:id="@+id/mainSwOpcion" android:showText="false"
+            android:checked="true" android:textColor="@color/colorPrimaryDark" android:textAlignment="viewEnd"/>
+    <Button
+            android:id="@+id/mainBtnAccion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello World!"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:text="Seleccionar o capturar Foto"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageView
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:scaleType="fitXY"
+            android:src="@mipmap/ic_launcher"
+            android:id="@+id/mainIvImagen"/>
+
+    <TextView
+            android:id="@+id/mainTvPath"
+            android:layout_width="match_parent"
+            android:layout_height="61dp"
+            android:text="Path" android:gravity="center|center_horizontal|center_vertical"
+            android:textColor="@color/colorPrimary"/>
+    <TextView
+            android:text="Compresion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/textView" android:gravity="center_horizontal"
+            android:textColor="@color/colorPrimaryDark"/>
+    <SeekBar
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="10"
+            android:progress="8"
+            android:id="@+id/mainSeekCompresion"/>
+    <Button
+            android:text="Eliminar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/mainBtnEliminar"
+    />
+
+</LinearLayout>
